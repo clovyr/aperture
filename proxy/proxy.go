@@ -114,6 +114,11 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.Method == "GET" && r.URL.Path == "/.aperture/healthz" {
+		sendDirectResponse(w, r, http.StatusOK, "")
+		return
+	}
+
 	// Requests that can't be matched to a service backend will be
 	// dispatched to the static file server. If the file exists in the
 	// static file folder it will be served, otherwise the static server
