@@ -16,11 +16,18 @@ ARG checkout="master"
 # Install dependencies and install/build aperture
 RUN apk add --no-cache --update alpine-sdk \
     git \
-    make \
-&& git clone https://github.com/lightninglabs/aperture /go/src/github.com/lightninglabs/aperture \
-&& cd /go/src/github.com/lightninglabs/aperture \
-&& git checkout $checkout \
-&& make install
+    make
+
+# Install dependencies and install/build aperture
+WORKDIR /go/src/github.com/lightninglabs/aperture
+
+COPY go.mod go.sum ./
+ENV GO111MODULE on
+ENV CGO_ENABLED 1
+RUN go mod download
+
+COPY . .
+RUN make install
 
 # Start a new, final image to reduce size.
 FROM alpine as final
